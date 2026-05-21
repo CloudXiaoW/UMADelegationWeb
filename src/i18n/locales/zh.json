@@ -150,6 +150,7 @@
     "STAKE_EXCEEDS_BALANCE": "数量超过钱包 UMA 余额（{balance} UMA）。",
     "STAKE_LIMITS_UNAVAILABLE": "无法读取委托限额配置，请稍后重试。",
     "REDEEM_OUT_OF_RANGE": "赎回数量须在 {min}～{max} UMA-V 之间（含边界）。",
+    "REDEEM_EXCEEDS_BALANCE": "数量超过可用 UMA-V（{balance} UMA-V）。",
     "REDEEM_INVALID_AMOUNT": "请输入大于 0 的有效赎回数量。",
     "REDEEM_LIMITS_UNAVAILABLE": "无法读取赎回限额，请稍后重试。",
     "NOT_CLAIMABLE": "当前赎回尚未可领取，请等待链上状态更新后再试。",

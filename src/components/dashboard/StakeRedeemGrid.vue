@@ -63,6 +63,11 @@ const err = computed(() => {
     }
     return t('errors.REDEEM_LIMITS_UNAVAILABLE')
   }
+  if (props.formError === 'REDEEM_EXCEEDS_BALANCE') {
+    return t('errors.REDEEM_EXCEEDS_BALANCE', {
+      balance: props.position?.umaVBalance ?? '—',
+    })
+  }
   if (props.formError === 'REDEEM_INVALID_AMOUNT') return t('errors.REDEEM_INVALID_AMOUNT')
   if (props.formError === 'REDEEM_LIMITS_UNAVAILABLE') return t('errors.REDEEM_LIMITS_UNAVAILABLE')
   if (props.formError === 'NOT_CLAIMABLE') return t('errors.NOT_CLAIMABLE')
@@ -129,6 +134,13 @@ const redeemRangeHint = computed(() => {
       min: props.limits.minRedeem,
       max: props.limits.maxRedeem,
     })
+  }
+  const balanceHuman = props.position?.umaVBalance
+  if (balanceHuman) {
+    const balanceWei = parseUmaHumanToWei(balanceHuman)
+    if (balanceWei !== null && w > balanceWei) {
+      return t('errors.REDEEM_EXCEEDS_BALANCE', { balance: balanceHuman })
+    }
   }
   return null
 })

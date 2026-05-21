@@ -22,9 +22,9 @@ function isRedeemAmountWithinLimits(amountHuman: string, lim: StakeLimits): bool
   return w >= minW && w <= maxW
 }
 
-function isStakeAmountWithinWalletBalance(amountHuman: string, walletBalanceHuman: string): boolean {
+function isAmountWithinBalance(amountHuman: string, balanceHuman: string): boolean {
   const amountWei = parseUmaHumanToWei(amountHuman)
-  const balanceWei = parseUmaHumanToWei(walletBalanceHuman)
+  const balanceWei = parseUmaHumanToWei(balanceHuman)
   if (amountWei === null || balanceWei === null) return false
   return amountWei <= balanceWei
 }
@@ -151,7 +151,8 @@ export function useStakeRedeemActions(
     if (
       formError.value === 'REDEEM_OUT_OF_RANGE' ||
       formError.value === 'REDEEM_INVALID_AMOUNT' ||
-      formError.value === 'REDEEM_LIMITS_UNAVAILABLE'
+      formError.value === 'REDEEM_LIMITS_UNAVAILABLE' ||
+      formError.value === 'REDEEM_EXCEEDS_BALANCE'
     ) {
       formError.value = null
     }
@@ -164,7 +165,7 @@ export function useStakeRedeemActions(
     const lim = limits.value
     if (!lim) return false
     if (!isStakeAmountWithinLimits(stakeAmount.value, lim)) return false
-    return isStakeAmountWithinWalletBalance(stakeAmount.value, p.umaWalletBalance)
+    return isAmountWithinBalance(stakeAmount.value, p.umaWalletBalance)
   })
 
   const canRequestRedeem = computed(() => {
@@ -173,7 +174,8 @@ export function useStakeRedeemActions(
     if (p.hasActiveRedeem) return false
     const lim = limits.value
     if (!lim) return false
-    return isRedeemAmountWithinLimits(redeemAmount.value, lim)
+    if (!isRedeemAmountWithinLimits(redeemAmount.value, lim)) return false
+    return isAmountWithinBalance(redeemAmount.value, p.umaVBalance)
   })
 
   function assertStakeAmountReady(lim: StakeLimits): boolean {
@@ -186,8 +188,34 @@ export function useStakeRedeemActions(
       formError.value = 'STAKE_OUT_OF_RANGE'
       return false
     }
-    if (!isStakeAmountWithinWalletBalance(stakeAmount.value, p.umaWalletBalance)) {
+    if (!isAmountWithinBalance(stakeAmount.value, p.umaWalletBalance)) {
       formError.value = 'STAKE_EXCEEDS_BALANCE'
+      return false
+    }
+    return true
+  }
+
+  function assertRedeemAmountReady(lim: StakeLimits): boolean {
+    const p = getPosition()
+    if (!p) {
+      formError.value = 'WALLET_NOT_CONNECTED'
+      return false
+    }
+    if (p.hasActiveRedeem) {
+      formError.value = 'ACTIVE_REDEEM_EXISTS'
+      return false
+    }
+    const w = parseUmaHumanToWei(redeemAmount.value.trim() || '')
+    if (w === null || w <= 0n) {
+      formError.value = 'REDEEM_INVALID_AMOUNT'
+      return false
+    }
+    if (!isRedeemAmountWithinLimits(redeemAmount.value, lim)) {
+      formError.value = 'REDEEM_OUT_OF_RANGE'
+      return false
+    }
+    if (!isAmountWithinBalance(redeemAmount.value, p.umaVBalance)) {
+      formError.value = 'REDEEM_EXCEEDS_BALANCE'
       return false
     }
     return true
@@ -242,21 +270,7 @@ export function useStakeRedeemActions(
         formError.value = 'REDEEM_LIMITS_UNAVAILABLE'
         return
       }
-      const w = parseUmaHumanToWei(redeemAmount.value.trim() || '')
-      if (w === null || w <= 0n) {
-        formError.value = 'REDEEM_INVALID_AMOUNT'
-        return
-      }
-      const minW = parseUmaHumanToWei(lim.minRedeem)
-      const maxW = parseUmaHumanToWei(lim.maxRedeem)
-      if (minW === null || maxW === null) {
-        formError.value = 'REDEEM_LIMITS_UNAVAILABLE'
-        return
-      }
-      if (w < minW || w > maxW) {
-        formError.value = 'REDEEM_OUT_OF_RANGE'
-        return
-      }
+      if (!assertRedeemAmountReady(lim)) return
 
       const r = await poolService.requestRedeem(redeemAmount.value)
       lastTxHash.value = r.txHash

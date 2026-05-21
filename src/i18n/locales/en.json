@@ -150,6 +150,7 @@
     "STAKE_EXCEEDS_BALANCE": "Amount exceeds your wallet UMA balance ({balance} UMA).",
     "STAKE_LIMITS_UNAVAILABLE": "Could not load stake limits from config. Try again later.",
     "REDEEM_OUT_OF_RANGE": "Redeem amount must be between {min} and {max} UMA-V (inclusive).",
+    "REDEEM_EXCEEDS_BALANCE": "Amount exceeds your available UMA-V ({balance} UMA-V).",
     "REDEEM_INVALID_AMOUNT": "Enter a valid redeem amount greater than zero.",
     "REDEEM_LIMITS_UNAVAILABLE": "Could not load redeem limits. Try again later.",
     "NOT_CLAIMABLE": "This redemption is not claimable yet. Wait for on-chain state to update.",
