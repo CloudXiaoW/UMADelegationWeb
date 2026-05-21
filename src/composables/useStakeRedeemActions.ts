@@ -22,6 +22,13 @@ function isRedeemAmountWithinLimits(amountHuman: string, lim: StakeLimits): bool
   return w >= minW && w <= maxW
 }
 
+function isStakeAmountWithinWalletBalance(amountHuman: string, walletBalanceHuman: string): boolean {
+  const amountWei = parseUmaHumanToWei(amountHuman)
+  const balanceWei = parseUmaHumanToWei(walletBalanceHuman)
+  if (amountWei === null || balanceWei === null) return false
+  return amountWei <= balanceWei
+}
+
 /** Parse `navUmaPerShare` from metrics (UMA per 1 UMA-V). */
 function navUmaPerOneShare(metrics: PoolMetrics | null): number | null {
   if (!metrics?.navUmaPerShare) return null
@@ -129,7 +136,11 @@ export function useStakeRedeemActions(
   )
 
   watch([stakeAmount, metrics], () => {
-    if (formError.value === 'STAKE_OUT_OF_RANGE' || formError.value === 'STAKE_LIMITS_UNAVAILABLE') {
+    if (
+      formError.value === 'STAKE_OUT_OF_RANGE' ||
+      formError.value === 'STAKE_LIMITS_UNAVAILABLE' ||
+      formError.value === 'STAKE_EXCEEDS_BALANCE'
+    ) {
       formError.value = null
     }
     syncPreviewsFromCache()
@@ -152,7 +163,8 @@ export function useStakeRedeemActions(
     if (!walletConnected.value || !p) return false
     const lim = limits.value
     if (!lim) return false
-    return isStakeAmountWithinLimits(stakeAmount.value, lim)
+    if (!isStakeAmountWithinLimits(stakeAmount.value, lim)) return false
+    return isStakeAmountWithinWalletBalance(stakeAmount.value, p.umaWalletBalance)
   })
 
   const canRequestRedeem = computed(() => {
@@ -164,6 +176,23 @@ export function useStakeRedeemActions(
     return isRedeemAmountWithinLimits(redeemAmount.value, lim)
   })
 
+  function assertStakeAmountReady(lim: StakeLimits): boolean {
+    const p = getPosition()
+    if (!p) {
+      formError.value = 'WALLET_NOT_CONNECTED'
+      return false
+    }
+    if (!isStakeAmountWithinLimits(stakeAmount.value, lim)) {
+      formError.value = 'STAKE_OUT_OF_RANGE'
+      return false
+    }
+    if (!isStakeAmountWithinWalletBalance(stakeAmount.value, p.umaWalletBalance)) {
+      formError.value = 'STAKE_EXCEEDS_BALANCE'
+      return false
+    }
+    return true
+  }
+
   async function approveUma(): Promise<void> {
     busy.value = 'approve'
     formError.value = null
@@ -173,10 +202,7 @@ export function useStakeRedeemActions(
         formError.value = 'STAKE_LIMITS_UNAVAILABLE'
         return
       }
-      if (!isStakeAmountWithinLimits(stakeAmount.value, lim)) {
-        formError.value = 'STAKE_OUT_OF_RANGE'
-        return
-      }
+      if (!assertStakeAmountReady(lim)) return
       const r = await poolService.approveUma(stakeAmount.value || '0')
       lastTxHash.value = r.txHash
       umaApproved.value = await poolService.getUmaAllowance(stakeAmount.value || '0')
@@ -196,10 +222,7 @@ export function useStakeRedeemActions(
         formError.value = 'STAKE_LIMITS_UNAVAILABLE'
         return
       }
-      if (!isStakeAmountWithinLimits(stakeAmount.value, lim)) {
-        formError.value = 'STAKE_OUT_OF_RANGE'
-        return
-      }
+      if (!assertStakeAmountReady(lim)) return
       const { txHash } = await poolService.stakeUma(stakeAmount.value)
       lastTxHash.value = txHash
       stakeAmount.value = ''

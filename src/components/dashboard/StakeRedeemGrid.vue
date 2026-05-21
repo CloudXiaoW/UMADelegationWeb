@@ -48,6 +48,11 @@ const err = computed(() => {
     }
     return t('errors.STAKE_LIMITS_UNAVAILABLE')
   }
+  if (props.formError === 'STAKE_EXCEEDS_BALANCE') {
+    return t('errors.STAKE_EXCEEDS_BALANCE', {
+      balance: props.position?.umaWalletBalance ?? '—',
+    })
+  }
   if (props.formError === 'STAKE_LIMITS_UNAVAILABLE') return t('errors.STAKE_LIMITS_UNAVAILABLE')
   if (props.formError === 'REDEEM_OUT_OF_RANGE') {
     if (props.limits) {
@@ -94,6 +99,13 @@ const stakeRangeHint = computed(() => {
       min: props.limits.minStake,
       max: props.limits.maxStake,
     })
+  }
+  const balanceHuman = props.position?.umaWalletBalance
+  if (balanceHuman) {
+    const balanceWei = parseUmaHumanToWei(balanceHuman)
+    if (balanceWei !== null && w > balanceWei) {
+      return t('errors.STAKE_EXCEEDS_BALANCE', { balance: balanceHuman })
+    }
   }
   return null
 })

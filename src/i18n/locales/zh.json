@@ -147,6 +147,7 @@
     "WALLET_NOT_CONNECTED": "请先连接钱包。",
     "INVALID_AMOUNT": "请输入大于 0 的有效 UMA 数量。",
     "STAKE_OUT_OF_RANGE": "委托数量须在 {min}～{max} UMA 之间（含边界）。",
+    "STAKE_EXCEEDS_BALANCE": "数量超过钱包 UMA 余额（{balance} UMA）。",
     "STAKE_LIMITS_UNAVAILABLE": "无法读取委托限额配置，请稍后重试。",
     "REDEEM_OUT_OF_RANGE": "赎回数量须在 {min}～{max} UMA-V 之间（含边界）。",
     "REDEEM_INVALID_AMOUNT": "请输入大于 0 的有效赎回数量。",
