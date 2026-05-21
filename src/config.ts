@@ -10,14 +10,20 @@ export const FEE_RULE_NOMINAL_PERCENT = Number(import.meta.env.VITE_FEE_RULE_NOM
 export const FEE_RULE_ACTUAL_PERCENT = Number(import.meta.env.VITE_FEE_RULE_ACTUAL_PERCENT ?? 3)
 
 /**
- * Deposit: scale **expected vault shares** by `(10000 - depositShareAdjustBps) / 10000` (basis points).
- * Used by `previewDeposit` / stake preview UI. Override: `VITE_DEPOSIT_SHARE_ADJUST_BPS` (integer 0–10000).
+ * Deposit: during UMA **reveal** phase only, scale expected vault shares by
+ * `(10000 - depositShareAdjustBps) / 10000` (basis points). Commit phase uses no adjustment.
+ * Round = 2 days (commit 1d + reveal 1d); phase from `VotingV2.getVotePhase()`.
+ * Override: `VITE_DEPOSIT_SHARE_ADJUST_BPS` (integer 0–10000).
  */
 const rawDepositShareAdjustBps = Number(import.meta.env.VITE_DEPOSIT_SHARE_ADJUST_BPS ?? 0)
 export const depositShareAdjustBps = Math.min(10000, Math.trunc(rawDepositShareAdjustBps))
 
-/** Apply {@link depositShareAdjustBps} to raw share wei (e.g. from `previewDeposit`). */
-export function applyDepositShareAdjustBpsToSharesWei(sharesWei: bigint): bigint {
+/**
+ * Apply {@link depositShareAdjustBps} to raw share wei when `inRevealPhase` is true.
+ * Commit phase returns `sharesWei` unchanged.
+ */
+export function applyDepositShareAdjustBpsToSharesWei(sharesWei: bigint, inRevealPhase: boolean): bigint {
+  if (!inRevealPhase) return sharesWei
   if (depositShareAdjustBps <= 0) return sharesWei
   if (depositShareAdjustBps >= 10000) return 0n
   return (sharesWei * BigInt(10000 - depositShareAdjustBps)) / 10000n

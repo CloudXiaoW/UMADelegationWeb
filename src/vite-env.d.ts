@@ -25,7 +25,7 @@ interface ImportMetaEnv {
   readonly VITE_SEPOLIA_VOTING_V2?: `0x${string}`
   /** Mainnet VotingV2 contract address (optional override). */
   readonly VITE_MAINNET_VOTING_V2?: `0x${string}`
-  /** Deposit: basis points deducted from displayed vault shares after `previewDeposit` (0–10000). */
+  /** Deposit: basis points deducted from displayed vault shares during reveal phase only (0–10000). */
   readonly VITE_DEPOSIT_SHARE_ADJUST_BPS?: string
   /** thirdweb Client ID (browser / Connect); create at https://thirdweb.com/create-api-key */
   readonly VITE_THIRDWEB_CLIENT_ID?: string

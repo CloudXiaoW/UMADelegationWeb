@@ -8,6 +8,7 @@ import {
   parseStakeLimitsConfigJson,
 } from '@/config'
 import { isRedeemPastClaimableTime } from '@/lib/redeemClaimWindow'
+import { isVotingRevealPhase } from '@/lib/votingPhase'
 import { parseUmaHumanToWei } from '@/lib/parseUmaAmount'
 import type { PoolMetrics, RedeemRequestView, RedeemTimelineStep, StakeLimits, UserPosition } from '@/types/pool'
 
@@ -533,7 +534,8 @@ class DefaultPoolService implements IPoolService {
     if (assetsWei === null || assetsWei <= 0n) return '0.00'
     const sharesWei = await readVaultPreviewDepositSharesWei(assetsWei)
     if (sharesWei === null) return '0.00'
-    return formatAmountForUi(applyDepositShareAdjustBpsToSharesWei(sharesWei), 18)
+    const inReveal = await isVotingRevealPhase()
+    return formatAmountForUi(applyDepositShareAdjustBpsToSharesWei(sharesWei, inReveal), 18)
   }
 
   async previewRedeem(umaVAmount: string): Promise<string> {
@@ -580,7 +582,7 @@ class DefaultPoolService implements IPoolService {
     let umaVReceived = '0.00'
     if (balanceBefore !== null && balanceAfter !== null && balanceAfter >= balanceBefore) {
       const raw = balanceAfter - balanceBefore
-      umaVReceived = formatAmountForUi(applyDepositShareAdjustBpsToSharesWei(raw), 18)
+      umaVReceived = formatAmountForUi(raw, 18)
     } else {
       umaVReceived = await this.previewDeposit(umaAmount)
     }

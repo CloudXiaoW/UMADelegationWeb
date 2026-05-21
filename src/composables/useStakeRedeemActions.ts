@@ -1,6 +1,7 @@
 import { applyDepositShareAdjustBpsToSharesWei } from '@/config'
-import { type Ref, computed, reactive, ref, watch } from 'vue'
+import { type Ref, computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { parseUmaHumanToWei } from '@/lib/parseUmaAmount'
+import { getCachedVotingRevealPhase, refreshVotingRevealPhaseCache } from '@/lib/votingPhase'
 import { formatAmountForUi, poolService } from '@/services/poolService'
 import type { PoolMetrics, StakeLimits, UserPosition } from '@/types/pool'
 
@@ -46,8 +47,8 @@ function formatPreviewUi(n: number): string {
   return frac ? `${grouped}.${frac}` : grouped
 }
 
-/** Shares from assets / NAV (wei), then same {@link applyDepositShareAdjustBpsToSharesWei} as `previewDeposit` / `stakeUma`. */
-function stakePreviewFromNav(umaHuman: string, metrics: PoolMetrics | null): string {
+/** Shares from assets / NAV (wei); reveal-phase adjust matches `previewDeposit`. */
+function stakePreviewFromNav(umaHuman: string, metrics: PoolMetrics | null, inRevealPhase: boolean): string {
   if (!metrics?.navUmaPerShare) return '0.00'
   const raw = umaHuman.replace(/,/g, '').trim()
   const assetsWei = parseUmaHumanToWei(raw)
@@ -56,7 +57,7 @@ function stakePreviewFromNav(umaHuman: string, metrics: PoolMetrics | null): str
   const navWei = parseUmaHumanToWei(navStr)
   if (navWei === null || navWei <= 0n) return '0.00'
   const sharesRaw = (assetsWei * 10n ** 18n) / navWei
-  const sharesAdj = applyDepositShareAdjustBpsToSharesWei(sharesRaw)
+  const sharesAdj = applyDepositShareAdjustBpsToSharesWei(sharesRaw, inRevealPhase)
   return formatAmountForUi(sharesAdj, 18)
 }
 
@@ -87,13 +88,22 @@ export function useStakeRedeemActions(
   const busy = ref<'idle' | 'approve' | 'stake' | 'redeem' | 'claim'>('idle')
   const lastTxHash = ref<string | null>(null)
   const formError = ref<string | null>(null)
+  const votingInRevealPhase = ref(false)
 
   let allowanceDebounce: ReturnType<typeof setTimeout> | null = null
+  let phaseRefreshTimer: ReturnType<typeof setInterval> | null = null
 
   function syncPreviewsFromCache(): void {
     const nav = navUmaPerOneShare(metrics.value)
-    stakePreview.value = stakePreviewFromNav(stakeAmount.value, metrics.value)
+    const cachedReveal = getCachedVotingRevealPhase()
+    const inReveal = cachedReveal ?? votingInRevealPhase.value
+    stakePreview.value = stakePreviewFromNav(stakeAmount.value, metrics.value, inReveal)
     redeemPreview.value = redeemPreviewFromNav(redeemAmount.value, nav)
+  }
+
+  async function syncVotingPhase(): Promise<void> {
+    votingInRevealPhase.value = await refreshVotingRevealPhaseCache()
+    syncPreviewsFromCache()
   }
 
   function scheduleAllowanceCheck(): void {
@@ -122,6 +132,7 @@ export function useStakeRedeemActions(
       umaApproved.value = false
     }
     syncPreviewsFromCache()
+    await syncVotingPhase()
   }
 
   watch(
@@ -134,6 +145,16 @@ export function useStakeRedeemActions(
     },
     { immediate: true },
   )
+
+  onMounted(() => {
+    phaseRefreshTimer = setInterval(() => {
+      void syncVotingPhase()
+    }, 60_000)
+  })
+
+  onUnmounted(() => {
+    if (phaseRefreshTimer) clearInterval(phaseRefreshTimer)
+  })
 
   watch([stakeAmount, metrics], () => {
     if (
