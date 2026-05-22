@@ -1,6 +1,6 @@
 {
   "sepolia": {
-    "minStake": "200",
+    "minStake": "10",
     "maxStake": "10000000",
     "minRedeem": "1000",
     "maxRedeem": "10000000"
@@ -8,7 +8,7 @@
   "mainnet": {
     "minStake": "10",
     "maxStake": "10000000",
-    "minRedeem": "1000",
+    "minRedeem": "10",
     "maxRedeem": "10000000"
   }
 }
