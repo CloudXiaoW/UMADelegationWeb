@@ -131,6 +131,28 @@ const EXPLORER_BY_CHAIN: Record<ChainEnv, { tx: string; address: string }> = {
 
 export const EXPLORER_TX_BASE = EXPLORER_BY_CHAIN[CHAIN_ENV].tx
 export const EXPLORER_ADDRESS_BASE = EXPLORER_BY_CHAIN[CHAIN_ENV].address
+/** Nav「文档」— whitepapers (Google Drive). Override via `VITE_LINK_*`. */
+export const LINK_PRODUCT_WHITEPAPER_EN =
+  import.meta.env.VITE_LINK_PRODUCT_WHITEPAPER_EN?.trim() ||
+  'https://drive.google.com/file/d/10lv1eJUFF8bHm0snxHKmR5bjLaZE3nH3/view?usp=drive_link'
+export const LINK_PRODUCT_WHITEPAPER_CN =
+  import.meta.env.VITE_LINK_PRODUCT_WHITEPAPER_CN?.trim() ||
+  'https://drive.google.com/file/d/131gnMmJjXwYjAlbUnzyYKU5qXdYYYDBj/view?usp=drive_link'
+export const LINK_TECHNICAL_WHITEPAPER_EN =
+  import.meta.env.VITE_LINK_TECHNICAL_WHITEPAPER_EN?.trim() ||
+  'https://drive.google.com/file/d/1Ei5VAuMKjZgzUQhVhp0GAP4Hr9lXCXak/view?usp=drive_link'
+export const LINK_TECHNICAL_WHITEPAPER_CN =
+  import.meta.env.VITE_LINK_TECHNICAL_WHITEPAPER_CN?.trim() ||
+  'https://drive.google.com/file/d/1ppNttMfQXf33iMLFMYUfFCSgFdolwkaC/view?usp=drive_link'
+
+/** Ordered whitepaper entries for the nav Docs dropdown (before audit reports). */
+export const NAV_DOCS_WHITEPAPERS = [
+  { href: LINK_PRODUCT_WHITEPAPER_EN, i18nKey: 'nav.productWhitepaperEn' },
+  { href: LINK_PRODUCT_WHITEPAPER_CN, i18nKey: 'nav.productWhitepaperZh' },
+  { href: LINK_TECHNICAL_WHITEPAPER_EN, i18nKey: 'nav.technicalWhitepaperEn' },
+  { href: LINK_TECHNICAL_WHITEPAPER_CN, i18nKey: 'nav.technicalWhitepaperZh' },
+] as const
+
 /** Nav「文档」— audit reports (Google Drive). */
 export const LINK_AUDIT_REPORT_EN =
   'https://drive.google.com/file/d/1DE7IgobPXq8bKFXnbMKPVwhizFzi5ols/view?usp=sharing'

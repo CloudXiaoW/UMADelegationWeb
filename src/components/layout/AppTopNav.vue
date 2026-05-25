@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { LINK_AUDIT_REPORT_CN, LINK_AUDIT_REPORT_EN, LINK_CONTRACTS } from '@/config'
+import {
+  LINK_AUDIT_REPORT_CN,
+  LINK_AUDIT_REPORT_EN,
+  LINK_CONTRACTS,
+  NAV_DOCS_WHITEPAPERS,
+} from '@/config'
 
 const { t } = useI18n()
 
@@ -64,6 +69,18 @@ onUnmounted(() => {
             {{ t('nav.docs') }}
           </button>
           <div v-if="docsOpen" class="dropdown docs-dropdown" role="menu">
+            <a
+              v-for="doc in NAV_DOCS_WHITEPAPERS"
+              :key="doc.i18nKey"
+              class="row-a"
+              :href="doc.href"
+              target="_blank"
+              rel="noreferrer"
+              role="menuitem"
+              @click="closeDocs"
+            >
+              {{ t(doc.i18nKey) }}
+            </a>
             <a
               class="row-a"
               :href="LINK_AUDIT_REPORT_EN"
@@ -172,7 +189,7 @@ onUnmounted(() => {
 .docs-dropdown {
   left: 0;
   right: auto;
-  min-width: 200px;
+  min-width: 240px;
 }
 .docs-dropdown .row-a {
   display: block;

@@ -29,4 +29,12 @@ interface ImportMetaEnv {
   readonly VITE_DEPOSIT_SHARE_ADJUST_BPS?: string
   /** thirdweb Client ID (browser / Connect); create at https://thirdweb.com/create-api-key */
   readonly VITE_THIRDWEB_CLIENT_ID?: string
+  /** Nav docs: product whitepaper (English), Google Drive URL. */
+  readonly VITE_LINK_PRODUCT_WHITEPAPER_EN?: string
+  /** Nav docs: product whitepaper (Chinese), Google Drive URL. */
+  readonly VITE_LINK_PRODUCT_WHITEPAPER_CN?: string
+  /** Nav docs: technical whitepaper (English), Google Drive URL. */
+  readonly VITE_LINK_TECHNICAL_WHITEPAPER_EN?: string
+  /** Nav docs: technical whitepaper (Chinese), Google Drive URL. */
+  readonly VITE_LINK_TECHNICAL_WHITEPAPER_CN?: string
 }
