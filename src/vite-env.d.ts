@@ -37,4 +37,6 @@ interface ImportMetaEnv {
   readonly VITE_LINK_TECHNICAL_WHITEPAPER_EN?: string
   /** Nav docs: technical whitepaper (Chinese), Google Drive URL. */
   readonly VITE_LINK_TECHNICAL_WHITEPAPER_CN?: string
+  /** Discord invite URL for CTA popup. */
+  readonly VITE_DISCORD_INVITE_URL?: string
 }

@@ -161,6 +161,10 @@ export const LINK_AUDIT_REPORT_CN =
 /** Nav「合约」— delegation vault source repo. */
 export const LINK_CONTRACTS = 'https://github.com/CloudXiaoW/UMADelegationVault'
 
+/** Discord invite URL (CTA). Override via `VITE_DISCORD_INVITE_URL`. */
+export const DISCORD_INVITE_URL =
+  import.meta.env.VITE_DISCORD_INVITE_URL?.trim() || 'https://discord.gg/TE6392C437'
+
 /** @deprecated Use `CHAIN_CONTRACTS[CHAIN_ENV]` in UI; kept for any external imports. */
 export const PLACEHOLDER_VAULT = CHAIN_CONTRACTS.mainnet.stakeDelegationVault
 export const PLACEHOLDER_UMA_V = CHAIN_CONTRACTS.mainnet.umaVaultShare

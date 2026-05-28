@@ -17,7 +17,14 @@
     "title": "委托 UMA，省心参与。",
     "subtitle": "UMAVote.com 帮你统一维护 staking 与投票，你只需持有 UMA-V。",
     "ctaStake": "委托 UMA",
-    "ctaPosition": "查看我的资产"
+    "ctaPosition": "查看我的资产",
+    "ctaDiscord": "Discord 频道",
+    "discordModalTitle": "加入 Discord 频道",
+    "discordModalSubtitle": "点击复制或打开邀请链接",
+    "discordClose": "关闭",
+    "discordCopy": "复制链接",
+    "discordCopied": "已复制",
+    "discordOpen": "打开 Discord"
   },
   "stats": {
     "supplyTitle": "UMA-V 总份额",

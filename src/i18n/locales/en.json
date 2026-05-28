@@ -17,7 +17,14 @@
     "title": "Delegate UMA, stay hands-off.",
     "subtitle": "UMAVote.com helps you manage staking and voting in one place -- all you need to do is hold UMA-V.",
     "ctaStake": "Stake UMA",
-    "ctaPosition": "View My Position"
+    "ctaPosition": "View My Position",
+    "ctaDiscord": "Join our Discord",
+    "discordModalTitle": "Join our Discord",
+    "discordModalSubtitle": "Copy or open the invite link",
+    "discordClose": "Close",
+    "discordCopy": "Copy link",
+    "discordCopied": "Copied",
+    "discordOpen": "Open Discord"
   },
   "stats": {
     "supplyTitle": "UMA-V Total Supply",
